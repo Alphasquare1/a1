@@ -1,5 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:developer';
+
+import 'package:attendance/mysqpconnect.dart';
 import 'package:attendance/pages/bottomNavBar.dart';
 import 'package:attendance/theme/colors.dart';
 import 'package:attendance/utils/names.dart';
@@ -9,14 +12,50 @@ import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 
 class AttendencePage extends StatefulWidget {
-  const AttendencePage({Key? key}) : super(key: key);
+  int year;
+  String program;
+  String branch;
+  String subject;
+  DateTime selectedDate;
+  int semester;
+
+  AttendencePage({
+    required this.year,
+    required this.program,
+    required this.branch,
+    required this.subject,
+    required this.semester,
+    required this.selectedDate,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _AttendencePageState createState() => _AttendencePageState();
 }
 
 class _AttendencePageState extends State<AttendencePage> {
-    final studentvar = UserPrefrences.studentlist;
+  List<Map<String, dynamic>> studentsData = []; // Store student data here
+
+  @override
+  void initState() {
+    super.initState();
+    loadStudents(); // Load students data when the widget initializes
+  }
+
+  void loadStudents() async {
+    // Retrieve student data from the database using DatabaseHelper
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    studentsData = await databaseHelper.getStudents(
+      widget.program,
+      widget.branch,
+      widget.subject,
+      widget.semester,
+      widget.year,
+    );
+
+    // Set state to rebuild the UI with retrieved data
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +86,7 @@ class _AttendencePageState extends State<AttendencePage> {
             width: 400,
              color: Colors.white38,
             child: new ListView.builder(
-                itemCount: studentvar.length,
+                itemCount: studentsData.length,
                 itemBuilder: (BuildContext context, int index) =>
                     buildAttendenceCard(context, index)),
             // ListTile(
@@ -112,7 +151,8 @@ class _AttendencePageState extends State<AttendencePage> {
 
   buildAttendenceCard(BuildContext context, int index) {
     var index2 = index+1;
-    
+
+    log('Studnet data: ${studentsData[index]}');
     return FocusedMenuHolder(
       menuWidth: MediaQuery.of(context).size.width * 0.75,
       duration: Duration(milliseconds: 350),
@@ -202,8 +242,7 @@ class _AttendencePageState extends State<AttendencePage> {
                 SizedBox(
                   width: 25,
                 ),
-                Text(
-                  studentvar[index].studentName,
+                Text('',
                   style: TextStyle(fontSize: 20),
                 ),
               ],

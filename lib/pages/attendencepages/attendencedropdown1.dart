@@ -467,6 +467,10 @@ class AttendenceDropdownPage1 extends StatefulWidget {
 }
 
 class _AttendenceDropdownPage1State extends State<AttendenceDropdownPage1> {
+  String? Program_;
+  int? Year_;
+  String? Branch_;
+
   @override
   Widget build(BuildContext context) {
     // String programdropdownValue = Program[0];
@@ -474,8 +478,6 @@ class _AttendenceDropdownPage1State extends State<AttendenceDropdownPage1> {
     // String schooldropdownValue = School[0];
     // String semdropdownValue = Semester[0];
     // String yeardropdownValue = CollegeYear[0];
-        String Program_ ='';int Year_ =0;
-        String Branch_ ='';
 
     return Scaffold(
       body: Padding(
@@ -484,7 +486,11 @@ class _AttendenceDropdownPage1State extends State<AttendenceDropdownPage1> {
             physics: BouncingScrollPhysics(),
             children: [
               Center(
-                child: Image.asset('assets/Logo_Login_Page.png'),
+                child: Container(
+                  height:200,
+                width:200,
+                child: Image.asset('assets/college logo.jpeg'),
+                )
               ),
               const SizedBox(
                 height: 30,
@@ -518,7 +524,8 @@ class _AttendenceDropdownPage1State extends State<AttendenceDropdownPage1> {
                     ElevatedButton(
                       onPressed: (){
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => AttendenceDropdownpage2(Year_,Program_,Branch_)),);
+                          MaterialPageRoute(builder: (context) => AttendenceDropdownpage2(year: Year_!,program: Program_!,branch: Branch_!
+                          )),);
                       }, child: Text("Next"),
                       style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.black, backgroundColor: Colors.grey[100], fixedSize: Size(300,60),

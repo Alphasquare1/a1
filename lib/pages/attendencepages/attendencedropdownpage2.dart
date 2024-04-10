@@ -6,22 +6,26 @@ import 'package:attendance/utils/names.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/dropDownWidget.dart';
-
 class AttendenceDropdownpage2 extends StatefulWidget {
-  int year_;
-  String program_;
-  String branch_;
+  int year;
+  String program;
+  String branch;
 
-    AttendenceDropdownpage2({required int year_,required String program_,required String branch_, Key? key}) : super(key: key);
-
+  AttendenceDropdownpage2({
+    required this.year,
+    required this.program,
+    required this.branch,
+    Key? key,
+  }) : super(key: key);
 
   @override
-  _AttendenceDropdownpage2State createState() =>
-      _AttendenceDropdownpage2State();
+  _AttendenceDropdownpage2State createState() => _AttendenceDropdownpage2State();
 }
 
 class _AttendenceDropdownpage2State extends State<AttendenceDropdownpage2> {
   DateTime selectedDate = DateTime.now();
+  int? Semester_;
+  String? Subject_;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -44,8 +48,7 @@ class _AttendenceDropdownpage2State extends State<AttendenceDropdownpage2> {
     // String datedropdownValue = Date[0];
     // String monthdropdownValue = Month[0];
     // String yeardropdownValue = Year[0];
-    int Semester_=0;
-    String Subject_='';
+
 
     return Scaffold(
       appBar: AppBar(
@@ -80,7 +83,7 @@ class _AttendenceDropdownpage2State extends State<AttendenceDropdownpage2> {
               ),
               dropdown( DropdownValue :subjectdropdownValue, sTring:Subject,Hint: "Subject", onChanged: (newValue) {
                 setState(() {
-                  Semester_=newValue;
+                  Subject_=newValue;
                 });
               },),
               SizedBox(
@@ -250,8 +253,8 @@ class _AttendenceDropdownpage2State extends State<AttendenceDropdownpage2> {
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              Expanded(child: Text("Program : $programdropdownValue")),
-                              Expanded(child: Text("Branch : $branchdropdownValue")),
+                              Expanded(child: Text("Program : ${widget.program}")),
+                              Expanded(child: Text("Branch : ${widget.branch}")),
                             ],
                           ),
                         ),
@@ -259,8 +262,8 @@ class _AttendenceDropdownpage2State extends State<AttendenceDropdownpage2> {
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              Expanded(child: Text("Year : $yeardropdownValue")),
-                              Expanded(child: Text("Semester : $semesterdropdownValue"))
+                              Expanded(child: Text("Year : ${widget.year}")),
+                              Expanded(child: Text("Semester : ${Semester_}"))
                             ],
                           ),
                         ),
@@ -268,8 +271,8 @@ class _AttendenceDropdownpage2State extends State<AttendenceDropdownpage2> {
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              Expanded(child: Text("Batch : $batchdropdownValue")),
-                              Expanded(child: Text("Subject : $subjectdropdownValue"))
+                              Expanded(child: Text("Batch : ${widget.branch}")),
+                              Expanded(child: Text("Subject : ${Subject_}"))
                             ],
                           ),
                         ),
@@ -282,7 +285,7 @@ class _AttendenceDropdownpage2State extends State<AttendenceDropdownpage2> {
                                     onPressed: () {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
-                                            builder: (context) => AttendencePage()),
+                                            builder: (context) => AttendencePage(year: widget.year, program: widget.program, branch: widget.branch, subject: Subject_!, semester: Semester_!, selectedDate: selectedDate)),
                                       );
                                     },
                                     child: Text("Take Attendence")),

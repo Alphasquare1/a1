@@ -21,7 +21,8 @@ class DatabaseHelper {
     return await openDatabase(path, version: 1, onCreate: _createDatabase);
   }
 
-  Future<void> _createDatabase(Database db, int version) async {
+  Future<void> _createDatabase(Database db, int version) async
+  {
     // Create student_table
     await db.execute('''
       CREATE TABLE student_table (
@@ -46,6 +47,7 @@ class DatabaseHelper {
       )
     ''');
 
+
     // Create allocation_table
     await db.execute('''
       CREATE TABLE allocation_table (
@@ -59,7 +61,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE attendance_table (
         attendance_id INTEGER PRIMARY KEY,
-        date TEXT,
+        date DATE,
         allocation_id INTEGER,
         status INTEGER,
         FOREIGN KEY(allocation_id) REFERENCES allocation_table(allocation_id)
@@ -391,8 +393,10 @@ class DatabaseHelper {
     }
     //await _updateAllocations(db);
 
-    Future<void> _updateAllocations(Database db) async {
-      String query = '''
+  }
+
+  Future<void> _updateAllocations(Database db) async {
+    String query = '''
       INSERT INTO allocation_table (student_id, subject_id)
       SELECT s.student_id, sub.subject_id
       FROM student_table s
@@ -403,24 +407,9 @@ class DatabaseHelper {
       AND s.semester = sub.semester
     ''';
 
-      await db.transaction((txn) async {
-        await txn.execute(query);
-      });
-      Future<void> insertAttendanceRecord(String date, int allocationId,
-          int status) async {
-        final db = await database;
-        await db.insert('attendance_table', {
-          'date': date,
-          'allocation_id': allocationId,
-          'status': status,
-        });
-      }
-      await _updateAllocations(db);
-
-      // Insert initial data into allocation_table
-      // Linking students to subjects
-    }
-
+    await db.transaction((txn) async {
+      await txn.execute(query);
+    });
     Future<void> insertAttendanceRecord(String date, int allocationId,
         int status) async {
       final db = await database;
@@ -429,16 +418,39 @@ class DatabaseHelper {
         'allocation_id': allocationId,
         'status': status,
       });
-      Future<void> updateAttendanceStatus(
-          String date, int allocationId, int newStatus) async {
-        final db = await database;
-        await db.update(
-          'attendance_table',
-          {'status': newStatus},
-          where: 'date = ? AND allocation_id = ?',
-          whereArgs: [date, allocationId],
-        );
     }
+    await _updateAllocations(db);
+
+    // Insert initial data into allocation_table
+    // Linking students to subjects
   }
+
+  Future<void> updateAttendanceStatus(String date, int allocationId, int newStatus) async {
+    final db = await database;
+    await db.update(
+      'attendance_table',
+      {'status': newStatus},
+      where: 'date = ? AND allocation_id = ?',
+      whereArgs: [date, allocationId],
+    );
   }
+
+  Future<List<Map<String, dynamic>>> getStudents(
+      String program,
+      String branch,
+      String subject,
+      int semester,
+      int year
+      ) async {
+    final db = await database;
+    return await db.rawQuery('''
+      SELECT att.*, st.student_name, sub.subject_name
+      FROM attendance_table att
+      INNER JOIN allocation_table alloc ON att.allocation_id = alloc.allocation_id
+      INNER JOIN student_table st ON alloc.student_id = st.student_id
+      INNER JOIN subject_table sub ON alloc.subject_id = sub.subject_id
+      WHERE st.year = ? AND st.program = ? AND st.branch = ? AND st.semester = ?
+    ''', [year, program, branch, semester]);
+  }
+
 }
