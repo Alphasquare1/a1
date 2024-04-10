@@ -41,6 +41,7 @@ dependencies:
   sqflite: ^2.0.0+4
   path_provider: ^2.0.14
   snippet_coder_utils: ^1.0.15
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   focused_menu: ^1.0.5

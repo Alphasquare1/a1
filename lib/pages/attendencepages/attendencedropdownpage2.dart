@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ffi';
 
 import 'package:attendance/pages/attendencepages/attendencePage.dart';
@@ -7,7 +8,7 @@ import 'package:flutter/material.dart';
 
 import '../../widgets/dropDownWidget.dart';
 class AttendenceDropdownpage2 extends StatefulWidget {
-  int year;
+  String year;
   String program;
   String branch;
 
@@ -24,8 +25,8 @@ class AttendenceDropdownpage2 extends StatefulWidget {
 
 class _AttendenceDropdownpage2State extends State<AttendenceDropdownpage2> {
   DateTime selectedDate = DateTime.now();
-  int? Semester_;
-  String? Subject_;
+  String Semester_ = Semester[0];
+  String Subject_= Subject[0];
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -74,6 +75,7 @@ class _AttendenceDropdownpage2State extends State<AttendenceDropdownpage2> {
                 height: 20,
               ),
               dropdown( DropdownValue :semesterdropdownValue, sTring: Semester,Hint :"Semester", onChanged: (newValue) {
+                log(newValue.toString());
                 setState(() {
                   Semester_=newValue;
                 });
@@ -82,6 +84,8 @@ class _AttendenceDropdownpage2State extends State<AttendenceDropdownpage2> {
                 height: 20,
               ),
               dropdown( DropdownValue :subjectdropdownValue, sTring:Subject,Hint: "Subject", onChanged: (newValue) {
+                log(newValue.toString());
+
                 setState(() {
                   Subject_=newValue;
                 });
@@ -271,7 +275,6 @@ class _AttendenceDropdownpage2State extends State<AttendenceDropdownpage2> {
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              Expanded(child: Text("Batch : ${widget.branch}")),
                               Expanded(child: Text("Subject : ${Subject_}"))
                             ],
                           ),
@@ -285,7 +288,7 @@ class _AttendenceDropdownpage2State extends State<AttendenceDropdownpage2> {
                                     onPressed: () {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
-                                            builder: (context) => AttendencePage(year: widget.year, program: widget.program, branch: widget.branch, subject: Subject_!, semester: Semester_!, selectedDate: selectedDate)),
+                                            builder: (context) => AttendencePage(year: widget.year, program: widget.program, branch: widget.branch, subject: Subject_, semester: Semester_, selectedDate: selectedDate)),
                                       );
                                     },
                                     child: Text("Take Attendence")),

@@ -5,6 +5,7 @@ import 'package:attendance/pages/loginpages/forgetpass.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
 class LoginPage extends StatefulWidget {
@@ -19,6 +20,9 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController EmailController =TextEditingController();
   TextEditingController PasswordController =TextEditingController();
   void login()async{
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
     String Email=EmailController.text.trim();
     String Password=PasswordController.text.trim();
     if(Email== "" || Password==" "){
@@ -28,6 +32,7 @@ class _LoginPageState extends State<LoginPage> {
       try{
         UserCredential userCredential= await  FirebaseAuth.instance.signInWithEmailAndPassword(email: Email, password: Password);
         if(userCredential.user!= null){
+          prefs.setBool('loggedIn', true);
           Navigator.push(context, CupertinoPageRoute(builder: (context) =>AttendenceDropdownPage1()));
 
         }
@@ -40,6 +45,7 @@ class _LoginPageState extends State<LoginPage> {
 
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

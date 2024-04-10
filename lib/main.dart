@@ -1,3 +1,5 @@
+import 'package:attendance/mysqpconnect.dart';
+
 import "firebase_options.dart";
 // ignore_for_file: camel_case_types
 import 'package:attendance/pages/addpages/add_faculty.dart';
@@ -27,6 +29,7 @@ import 'package:flutter/material.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseHelper().initDatabase();
   await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -46,7 +49,7 @@ class myApp extends StatelessWidget {
       title: 'Attendence Management System',
       theme: themeData,
       home:
-          LoginPage(),
+      AttendenceDropdownPage1(),
           // Logout(),
           // LoginNavScreen(),
           // AttendenceDropdownPage1(),

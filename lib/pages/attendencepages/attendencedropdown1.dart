@@ -467,9 +467,9 @@ class AttendenceDropdownPage1 extends StatefulWidget {
 }
 
 class _AttendenceDropdownPage1State extends State<AttendenceDropdownPage1> {
-  String? Program_;
-  int? Year_;
-  String? Branch_;
+  String? Program_ = Program[0];
+  String? Year_ = CollegeYear[0];
+  String? Branch_ = Branch[0];
 
   @override
   Widget build(BuildContext context) {
@@ -505,7 +505,7 @@ class _AttendenceDropdownPage1State extends State<AttendenceDropdownPage1> {
                   children: [SizedBox(height: 30,),
                     dropdown(DropdownValue: programdropdownValue, Hint: "Program", sTring: Program, onChanged: (newValue) {
                       setState(() {
-                        Year_=newValue;
+                        Program_=newValue;
                       });
                     } ,),SizedBox(height: 20,),
                    // dropdown(DropdownValue: schooldropdownValue,Hint: "School",sTring: School),SizedBox(height: 20,),

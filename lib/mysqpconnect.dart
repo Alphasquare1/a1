@@ -1,4 +1,6 @@
 
+import 'dart:developer';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -273,6 +275,7 @@ class DatabaseHelper {
 
     for (var student in students) {
       await db.insert('student_table', student);
+      log('Student inserted: $student');
     }
 
     // Insert initial data into subject_table
@@ -390,8 +393,9 @@ class DatabaseHelper {
 
     for (var subject in subjects) {
       await db.insert('subject_table', subject);
+      log('Subject inserted: $subject');
     }
-    //await _updateAllocations(db);
+    await _updateAllocations(db);
 
   }
 
@@ -419,7 +423,6 @@ class DatabaseHelper {
         'status': status,
       });
     }
-    await _updateAllocations(db);
 
     // Insert initial data into allocation_table
     // Linking students to subjects
@@ -427,30 +430,55 @@ class DatabaseHelper {
 
   Future<void> updateAttendanceStatus(String date, int allocationId, int newStatus) async {
     final db = await database;
-    await db.update(
+    await db.insert(
       'attendance_table',
-      {'status': newStatus},
-      where: 'date = ? AND allocation_id = ?',
-      whereArgs: [date, allocationId],
+      {
+        'date': date,
+        'allocation_id': allocationId,
+        'status': newStatus,
+      },
     );
   }
-
   Future<List<Map<String, dynamic>>> getStudents(
       String program,
       String branch,
       String subject,
-      int semester,
-      int year
+      String semester,
+      String year,
+      String date,
       ) async {
     final db = await database;
-    return await db.rawQuery('''
-      SELECT att.*, st.student_name, sub.subject_name
-      FROM attendance_table att
-      INNER JOIN allocation_table alloc ON att.allocation_id = alloc.allocation_id
-      INNER JOIN student_table st ON alloc.student_id = st.student_id
-      INNER JOIN subject_table sub ON alloc.subject_id = sub.subject_id
-      WHERE st.year = ? AND st.program = ? AND st.branch = ? AND st.semester = ?
-    ''', [year, program, branch, semester]);
+
+    var students = await db.rawQuery('''
+    SELECT alloc.*, st.*
+    FROM allocation_table alloc
+    INNER JOIN student_table st ON alloc.student_id = st.student_id
+    INNER JOIN subject_table sub ON alloc.subject_id = sub.subject_id
+    WHERE st.program = ? AND st.branch = ? AND sub.subject_name = ? AND st.semester = ? AND st.year = ?
+  ''', [program, branch, subject, semester, year]);
+
+    List<Map<String, dynamic>> modifiedStudents = [];
+
+    for (Map<String, dynamic> student in students) {
+      print('Date: $date');
+
+      List<Map<String, dynamic>> status = await db.rawQuery('''
+      SELECT status
+      FROM attendance_table
+      WHERE allocation_id = ?
+    ''', [student['allocation_id']]);
+
+      print('Status: $status');
+
+      // Create a new map to hold the modified student data
+      Map<String, dynamic> modifiedStudent = Map.from(student);
+      modifiedStudent['status'] = status.isNotEmpty ? status[0]['status'] : 3;
+
+      // Add the modified student data to the new list
+      modifiedStudents.add(modifiedStudent);
+    }
+
+    return modifiedStudents;
   }
 
 }

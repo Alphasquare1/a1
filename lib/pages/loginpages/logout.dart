@@ -3,6 +3,7 @@ import 'package:attendance/pages/loginpages/loginPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Logout extends StatefulWidget {
   const Logout({ Key? key }) : super(key: key);
@@ -11,6 +12,8 @@ class Logout extends StatefulWidget {
   _LogoutState createState() => _LogoutState();
 }
 void logout(BuildContext context) async{
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool('loggedIn', false);
   await FirebaseAuth.instance.signOut();
   Navigator.popUntil(context, (route) => route.isFirst);
   Navigator.pushReplacement(context, CupertinoPageRoute(builder: (context)=>LoginPage()));

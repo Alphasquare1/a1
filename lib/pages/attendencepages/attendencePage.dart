@@ -1,5 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:attendance/mysqpconnect.dart';
@@ -12,12 +13,12 @@ import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 
 class AttendencePage extends StatefulWidget {
-  int year;
+  String year;
   String program;
   String branch;
   String subject;
   DateTime selectedDate;
-  int semester;
+  String semester;
 
   AttendencePage({
     required this.year,
@@ -42,6 +43,16 @@ class _AttendencePageState extends State<AttendencePage> {
     loadStudents(); // Load students data when the widget initializes
   }
 
+  void updateAttendence(String date, int allocationId, int newStatus) async {
+    // Update attendence in the database using DatabaseHelper
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    await databaseHelper.updateAttendanceStatus(
+      date,
+      allocationId,
+        newStatus
+    );
+  }
+
   void loadStudents() async {
     // Retrieve student data from the database using DatabaseHelper
     DatabaseHelper databaseHelper = DatabaseHelper();
@@ -51,7 +62,18 @@ class _AttendencePageState extends State<AttendencePage> {
       widget.subject,
       widget.semester,
       widget.year,
+      widget.selectedDate.toString(),
     );
+
+    for (int i = 0; i < studentsData.length; i++) {
+      log('Student data: ${studentsData[i]}');
+      setState(() {
+        isSelectedList[i] = studentsData[i]['status'];
+        ChangeColor(isSelectedList, i);
+      });
+    }
+
+    log('Students data: $studentsData');
 
     // Set state to rebuild the UI with retrieved data
     setState(() {});
@@ -158,9 +180,15 @@ class _AttendencePageState extends State<AttendencePage> {
       duration: Duration(milliseconds: 350),
       animateMenuItems: true,
       onPressed: () {
+        updateAttendence(
+          widget.selectedDate.toString(),
+          studentsData[index]['allocation_id'],
+          1,
+        );
         setState(() {   
         ChangeState(isSelectedList, index, 1);
         ChangeColor(isSelectedList, index);
+
         });
         // Navigator.of(this.context).push(
           // MaterialPageRoute(builder: (context) => ProfilePage()),
@@ -177,7 +205,12 @@ class _AttendencePageState extends State<AttendencePage> {
             ),
             onPressed: () {
               setState(() {
-                
+
+                updateAttendence(
+                  widget.selectedDate.toString(),
+                  studentsData[index]['allocation_id'],
+                  1,
+                );
               ChangeState(isSelectedList, index, 1);
               ChangeColor(isSelectedList, index);
               });
@@ -196,6 +229,11 @@ class _AttendencePageState extends State<AttendencePage> {
                   fontSize: 15),
             ),
             onPressed: () {
+              updateAttendence(
+                widget.selectedDate.toString(),
+                studentsData[index]['allocation_id'],
+                0,
+              );
               setState(() {
                 
               ChangeState(isSelectedList, index, 0);
@@ -215,6 +253,11 @@ class _AttendencePageState extends State<AttendencePage> {
                   fontWeight: FontWeight.bold),
             ),
             onPressed: () {
+              updateAttendence(
+                widget.selectedDate.toString(),
+                studentsData[index]['allocation_id'],
+                2,
+              );
               setState(() {
                 
             ChangeState(isSelectedList, index, 2);
@@ -236,7 +279,7 @@ class _AttendencePageState extends State<AttendencePage> {
             child: Row(
               children: <Widget>[
                 Text(
-                  index2.toString(),
+                  studentsData[index]['student_name'].toString(),
                   style: TextStyle(fontSize: 20),
                 ),
                 SizedBox(
@@ -253,6 +296,7 @@ class _AttendencePageState extends State<AttendencePage> {
     );
   }
 void ChangeState(List<int> isSelectedList, int value, int i) {
+
   isSelectedList[value] = i;
 
 }

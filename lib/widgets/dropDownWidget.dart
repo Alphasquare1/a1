@@ -100,7 +100,8 @@ class dropdown extends StatefulWidget {
  String DropdownValue = '';
  List<String> sTring=[];
  String Hint='';
-dropdown({ Key? key ,required this.DropdownValue , required this.sTring, required this.Hint, required Null Function(dynamic newValue) onChanged,}) : super(key: key);
+ void Function(String) onChanged;
+dropdown({ Key? key ,required this.DropdownValue , required this.sTring, required this.Hint, required this.onChanged}) : super(key: key);
   
   @override
   _dropdownState createState() => _dropdownState();
@@ -184,7 +185,9 @@ void initState() {
                                         setState((){
                                            dropdownValue
                                        = newval!;
-                                    ChangeState();
+                                           widget.onChanged(newval); // Call the onChanged function provided by parent
+
+                                           ChangeState();
                                         });
                                         },
                                       
